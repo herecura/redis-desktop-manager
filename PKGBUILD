@@ -4,12 +4,12 @@
 pkgname=redis-desktop-manager
 _tag=0.9.3
 pkgver=0.9.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
 license=('GPL')
-depends=('qt5-base' 'qt5-charts' 'qt5-quickcontrols' 'libssh2')
+depends=('qt5-base' 'qt5-charts' 'qt5-quickcontrols2' 'libssh2')
 makedepends=('git' 'python2')
 conflicts=('redis-desktop-manager-bin')
 source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${_tag}")
