@@ -1,16 +1,17 @@
+# vim:set ft=sh:
 # Maintainer: BlackIkeEagle <ike DOT devolder AT gmail DOT com>
 # Contributor: Vyacheslav Konovalov <echo dnlhY2hrb25vdmFsb3ZAZ21haWwuY29tCg== | base64 -d>
 
 pkgname=redis-desktop-manager
-_tag=0.9.3
-pkgver=0.9.3
-pkgrel=2
+pkgver=0.9.4
+pkgrel=1
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
 license=('GPL')
-depends=('qt5-base' 'qt5-charts' 'qt5-quickcontrols2' 'libssh2')
-makedepends=('git' 'python2')
+depends=('qt5-base' 'qt5-imageformats' 'qt5-tools' 'qt5-declarative' 'qt5-quickcontrols'
+         'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts')
+makedepends=('git' 'python2' 'cmake')
 conflicts=('redis-desktop-manager-bin')
 source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${_tag}")
 sha512sums=('SKIP')
@@ -18,32 +19,38 @@ sha512sums=('SKIP')
 prepare() {
     cd rdm/
     git submodule update --init --recursive
-    git submodule add https://chromium.googlesource.com/linux-syscall-support 3rdparty/linux-syscall-support
+    python2 build/utils/set_version.py "${pkgver}" > \
+        src/version.h
 
-    python2 build/utils/set_version.py "${_tag}" > src/version.h
-    python2 build/utils/set_version.py "${_tag}" > 3rdparty/crashreporter/src/version.h
+    ## crashreporter is broken right now
+    #python2 build/utils/set_version.py "${pkgver}" > \
+        #3rdparty/crashreporter/src/version.h
 
-    _lssdir='3rdparty/gbreakpad/src/third_party/lss/'
-    mkdir -p ${_lssdir}
-    cp 3rdparty/linux-syscall-support/linux_syscall_support.h ${_lssdir}
+    sed -e '/sudo make install/d' \
+        -i 3rdparty/qredisclient/3rdparty/qsshclient/configure
+    sed -e 's#/usr/local/lib/libssh2.a#$$PWD/libssh2/bin/src/libssh2.a#' \
+        -i 3rdparty/qredisclient/3rdparty/qsshclient/3rdparty/3rdparty.pri
 
-    # fix rdm.sh
-    sed -e '/^export/d' -i src/resources/rdm.sh
-
-    # fix rdm.desktop
-    sed -e 's/^Exec.*/Exec=rdm/' \
-        -e 's/^Icon.*/Icon=rdm/' \
-        -i src/resources/rdm.desktop
+    cd "$srcdir/rdm/3rdparty/gbreakpad"
+    git clone --depth 1 \
+        -v https://chromium.googlesource.com/linux-syscall-support \
+        src/third_party/lss
 }
 
 build() {
-    cd $srcdir/rdm/3rdparty/crashreporter
-    qmake CONFIG+=release DESTDIR="$srcdir/rdm/bin/linux/release" QMAKE_LFLAGS_RPATH=""
-    make
+    ## crashreporter is broken right now
+    #cd "$srcdir/rdm/3rdparty/crashreporter"
+    #qmake CONFIG+=release \
+        #DESTDIR="$srcdir/rdm/bin/linux/release" \
+        #QMAKE_LFLAGS_RPATH=""
+    #make
 
-    cd $srcdir/rdm/3rdparty/gbreakpad
+    cd "$srcdir/rdm/3rdparty/gbreakpad"
     ./configure
     make
+
+    cd "$srcdir/rdm/3rdparty/qredisclient/3rdparty/qsshclient"
+    sh ./configure
 
     cd $srcdir/rdm/src
     qmake CONFIG+=release CLEAN_RPATH=true
@@ -51,17 +58,15 @@ build() {
 }
 
 package() {
-    _instdir="$srcdir/rdm/bin/linux/release"
-    _bindir="$pkgdir/usr/lib/redis-desktop-manager/bin"
+    cd $srcdir/rdm/src
+    make INSTALL_ROOT="$pkgdir" install
 
-    install -Dm755 "$_instdir/rdm" "$_bindir/rdm"
-    install -Dm755 "$_instdir/crashreporter" "$_bindir/crashreporter"
-    install -Dm755 "$srcdir/rdm/src/resources/rdm.sh" "$_bindir/rdm.sh"
+    ## crashreporter is broken right now
+    #install -Dm755 "$srcdir/rdm/bin/linux/release/crashreporter" \
+        #"$pkgdir/opt/redis-desktop-manager/crashreporter"
 
-    install -Dm644 "$srcdir/rdm/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-    install -Dm644 "$srcdir/rdm/src/resources/rdm.png" "$pkgdir/usr/share/pixmaps/rdm.png"
-    install -Dm644 "$srcdir/rdm/src/resources/rdm.desktop" "$pkgdir/usr/share/applications/rdm.desktop"
+    install -dm755 "$pkgdir/usr/bin"
+    ln -sf "/opt/redis-desktop-manager/rdm.sh" "$pkgdir/usr/bin/rdm"
 
-    mkdir "$pkgdir/usr/bin"
-    ln -sf "/usr/lib/redis-desktop-manager/bin/rdm.sh" "$pkgdir/usr/bin/rdm"
+    rm "$pkgdir/opt/redis-desktop-manager/qt.conf"
 }

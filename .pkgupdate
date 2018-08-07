@@ -1,2 +1,2 @@
-update__tag=$(wget -q -O- https://github.com/uglide/RedisDesktopManager/releases/ | grep -m1 -ie 'releases\/tag' | sed 's,.*tag\/\([0-9a-z\.\-]*\).*,\1,')
-update_pkgver=${update__tag/-/.}
+tag=$(wget -q -O- https://github.com/uglide/RedisDesktopManager/releases/ | grep -m1 -ie 'releases\/tag' | sed 's,.*tag\/\([0-9a-z\.\-]*\).*,\1,')
+update_pkgver=${tag/-/.}
