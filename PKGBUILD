@@ -4,17 +4,19 @@
 
 pkgname=redis-desktop-manager
 pkgver=0.9.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
 license=('GPL')
 depends=('qt5-base' 'qt5-imageformats' 'qt5-tools' 'qt5-declarative' 'qt5-quickcontrols'
-         'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts')
+         'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts' 'libssh2')
 makedepends=('git' 'python2' 'cmake')
 conflicts=('redis-desktop-manager-bin')
-source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${_tag}")
-sha512sums=('SKIP')
+source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${_tag}"
+        "qsshclient.diff")
+sha512sums=('SKIP'
+            '28e5d00c54234612821eecfa53f251d27b02e949b5cd820b175d46211cd637ac994382d9130f11d5ee197af3d214b4bfa0f45afd6e9d8b9648ef720ae19a263b')
 
 prepare() {
     cd rdm/
@@ -28,13 +30,18 @@ prepare() {
 
     sed -e '/sudo make install/d' \
         -i 3rdparty/qredisclient/3rdparty/qsshclient/configure
-    sed -e 's#/usr/local/lib/libssh2.a#$$PWD/libssh2/bin/src/libssh2.a#' \
-        -i 3rdparty/qredisclient/3rdparty/qsshclient/3rdparty/3rdparty.pri
 
-    cd "$srcdir/rdm/3rdparty/gbreakpad"
-    git clone --depth 1 \
-        -v https://chromium.googlesource.com/linux-syscall-support \
-        src/third_party/lss
+    (
+        cd 3rdparty/qredisclient/3rdparty/qsshclient
+        patch -p1 -i "$srcdir/qsshclient.diff"
+    )
+
+    (
+        cd 3rdparty/gbreakpad
+        git clone --depth 1 \
+            -v https://chromium.googlesource.com/linux-syscall-support \
+            src/third_party/lss
+    )
 }
 
 build() {
@@ -48,9 +55,6 @@ build() {
     cd "$srcdir/rdm/3rdparty/gbreakpad"
     ./configure
     make
-
-    cd "$srcdir/rdm/3rdparty/qredisclient/3rdparty/qsshclient"
-    sh ./configure
 
     cd $srcdir/rdm/src
     qmake CONFIG+=release CLEAN_RPATH=true
