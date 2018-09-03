@@ -4,7 +4,7 @@
 
 pkgname=redis-desktop-manager
 pkgver=0.9.6
-pkgrel=1
+pkgrel=2
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
@@ -22,10 +22,6 @@ prepare() {
     python2 build/utils/set_version.py "${pkgver}" > \
         src/version.h
 
-    ## crashreporter is broken right now
-    #python2 build/utils/set_version.py "${pkgver}" > \
-        #3rdparty/crashreporter/src/version.h
-
     sed -e '/sudo make install/d' \
         -i 3rdparty/qredisclient/3rdparty/qsshclient/configure
 
@@ -38,13 +34,6 @@ prepare() {
 }
 
 build() {
-    ## crashreporter is broken right now
-    #cd "$srcdir/rdm/3rdparty/crashreporter"
-    #qmake CONFIG+=release \
-        #DESTDIR="$srcdir/rdm/bin/linux/release" \
-        #QMAKE_LFLAGS_RPATH=""
-    #make
-
     cd "$srcdir/rdm/3rdparty/gbreakpad"
     ./configure
     make
@@ -58,9 +47,7 @@ package() {
     cd $srcdir/rdm/src
     make INSTALL_ROOT="$pkgdir" install
 
-    ## crashreporter is broken right now
-    #install -Dm755 "$srcdir/rdm/bin/linux/release/crashreporter" \
-        #"$pkgdir/opt/redis-desktop-manager/crashreporter"
+    chmod +x "$pkgdir/opt/redis-desktop-manager/rdm.sh"
 
     install -dm755 "$pkgdir/usr/bin"
     ln -sf "/opt/redis-desktop-manager/rdm.sh" "$pkgdir/usr/bin/rdm"
