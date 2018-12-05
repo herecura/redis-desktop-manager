@@ -3,7 +3,7 @@
 # Contributor: Vyacheslav Konovalov <echo dnlhY2hrb25vdmFsb3ZAZ21haWwuY29tCg== | base64 -d>
 
 pkgname=redis-desktop-manager
-pkgver=0.9.8
+pkgver=0.9.9
 pkgrel=1
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
@@ -21,9 +21,6 @@ prepare() {
     git submodule update --init --recursive
     python2 build/utils/set_version.py "${pkgver}" > \
         src/version.h
-
-    sed -e '/sudo make install/d' \
-        -i 3rdparty/qredisclient/3rdparty/qsshclient/configure
 
     (
         cd 3rdparty/gbreakpad
