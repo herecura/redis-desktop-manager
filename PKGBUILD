@@ -3,7 +3,7 @@
 # Contributor: Vyacheslav Konovalov <echo dnlhY2hrb25vdmFsb3ZAZ21haWwuY29tCg== | base64 -d>
 
 pkgname=redis-desktop-manager
-pkgver=0.9.9
+pkgver=2019.0
 pkgrel=1
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
@@ -13,7 +13,7 @@ depends=('qt5-base' 'qt5-imageformats' 'qt5-tools' 'qt5-declarative' 'qt5-quickc
          'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts' 'libssh2')
 makedepends=('git' 'python2' 'cmake')
 conflicts=('redis-desktop-manager-bin')
-source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${_tag}")
+source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${pkgver}")
 sha512sums=('SKIP')
 
 prepare() {
