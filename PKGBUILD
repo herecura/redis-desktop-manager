@@ -4,14 +4,16 @@
 
 pkgname=redis-desktop-manager
 pkgver=2019.2
-pkgrel=2
+pkgrel=3
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
 license=('GPL')
-depends=('qt5-base' 'qt5-imageformats' 'qt5-tools' 'qt5-declarative' 'qt5-quickcontrols2'
-         'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts' 'libssh2')
-makedepends=('git' 'python' 'cmake')
+depends=('qt5-base' 'qt5-imageformats' 'qt5-tools' 'qt5-declarative'
+         'qt5-quickcontrols2' 'qt5-graphicaleffects' 'qt5-svg' 'qt5-charts'
+         'libssh2' 'python-bitstring' 'python-cbor' 'python-msgpack'
+         'python-phpserialize' 'python-rdbtools')
+makedepends=('git')
 conflicts=('redis-desktop-manager-bin')
 source=("rdm::git://github.com/uglide/RedisDesktopManager.git#tag=${pkgver}")
 sha512sums=('SKIP')
