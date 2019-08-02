@@ -3,8 +3,8 @@
 # Contributor: Vyacheslav Konovalov <echo dnlhY2hrb25vdmFsb3ZAZ21haWwuY29tCg== | base64 -d>
 
 pkgname=redis-desktop-manager
-pkgver=2019.2
-pkgrel=3
+pkgver=2019.3
+pkgrel=1
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
 url="https://redisdesktop.com/"
