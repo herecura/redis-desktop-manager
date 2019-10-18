@@ -3,7 +3,7 @@
 # Contributor: Vyacheslav Konovalov <echo dnlhY2hrb25vdmFsb3ZAZ21haWwuY29tCg== | base64 -d>
 
 pkgname=redis-desktop-manager
-pkgver=2019.3
+pkgver=2019.4
 pkgrel=1
 pkgdesc='Open source cross-platform Redis Desktop Manager based on Qt 5'
 arch=('x86_64')
@@ -23,20 +23,9 @@ prepare() {
     git submodule update --init --recursive
     python3 build/utils/set_version.py "${pkgver}" > \
         src/version.h
-
-    (
-        cd 3rdparty/gbreakpad
-        git clone --depth 1 \
-            -v https://chromium.googlesource.com/linux-syscall-support \
-            src/third_party/lss
-    )
 }
 
 build() {
-    cd "$srcdir/rdm/3rdparty/gbreakpad"
-    ./configure
-    make
-
     cd $srcdir/rdm/src
     qmake CONFIG+=release CLEAN_RPATH=true
     make
